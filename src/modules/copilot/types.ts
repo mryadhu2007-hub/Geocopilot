@@ -16,8 +16,9 @@ export interface CopilotMessage {
   role: MessageRole;
   content: string;
   timestamp: string;
+  intent?: string;
   suggestedAction?: {
-    type: "create_workflow" | "load_layer" | "run_analysis";
+    type: "create_workflow" | "load_layer" | "run_analysis" | "select_dataset" | "review_workflow" | "approve_gate";
     payload: unknown;
   };
 }
@@ -39,6 +40,11 @@ export interface CopilotPlanProposal {
 
 export interface CopilotComponentProps {
   messages?: CopilotMessage[];
+  currentIntent?: string;
+  planProposal?: CopilotPlanProposal | null;
+  isThinking?: boolean;
   onSendMessage?: (content: string) => void;
   onAcceptPlan?: (plan: CopilotPlanProposal) => void;
+  onQuickPromptClick?: (prompt: string) => void;
 }
+

@@ -10,23 +10,48 @@
  */
 
 export type WorkflowStepType =
+  | "intent_definition"
   | "dataset_input"
+  | "harmonize_crs"
   | "spatial_filter"
   | "buffer_geometry"
   | "overlay_analysis"
   | "ai_classification"
   | "human_approval_gate"
+  | "execute_spatial_op"
+  | "validate_results"
   | "export_results";
 
 export type ExecutionState = "idle" | "running" | "paused_for_approval" | "completed" | "failed";
+
+export type WorkflowStatus =
+  | "draft"
+  | "planned"
+  | "awaiting-approval"
+  | "executing"
+  | "completed"
+  | "failed";
+
+export type ApprovalStatus = "not-required" | "pending" | "approved" | "rejected" | "edited";
+
+export type PipelineStage =
+  | "intent"
+  | "data"
+  | "harmonize"
+  | "review"
+  | "execute"
+  | "validate";
 
 export interface WorkflowNode {
   id: string;
   type: WorkflowStepType;
   label: string;
+  stage?: PipelineStage;
   position: { x: number; y: number };
   status: ExecutionState;
   parameters?: Record<string, unknown>;
+  description?: string;
+  outputSummary?: string;
 }
 
 export interface WorkflowEdge {
@@ -42,6 +67,8 @@ export interface WorkflowGraph {
   nodes: WorkflowNode[];
   edges: WorkflowEdge[];
   state: ExecutionState;
+  status?: WorkflowStatus;
+  createdAt?: string;
 }
 
 export interface HumanApprovalGate {
@@ -50,10 +77,19 @@ export interface HumanApprovalGate {
   estimatedCost?: string;
   dataSummary: string;
   isApproved: boolean;
+  status: ApprovalStatus;
+  reason?: string;
+  actionRequired?: string;
+  decisionNote?: string;
+  modifiedParams?: Record<string, unknown>;
 }
 
 export interface WorkflowComponentProps {
   workflow?: WorkflowGraph;
+  currentStage?: PipelineStage;
+  approvalGate?: HumanApprovalGate | null;
   onExecute?: (workflowId: string) => void;
-  onApproveStep?: (nodeId: string) => void;
+  onApproveStep?: (nodeId: string, note?: string) => void;
+  onRejectStep?: (nodeId: string, reason?: string) => void;
+  onModifyStep?: (nodeId: string, params: Record<string, unknown>) => void;
 }
