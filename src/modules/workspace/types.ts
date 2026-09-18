@@ -1,4 +1,4 @@
-import type { GeospatialDataset } from "@/modules/data/types";
+import type { GeospatialDataset, DatasetProfileResult } from "@/modules/data/types";
 import type { MapViewportState, MapLayer } from "@/modules/map/types";
 import type { CopilotMessage, CopilotPlanProposal } from "@/modules/copilot/types";
 import type {
@@ -29,6 +29,8 @@ export interface AuditEvent {
     | "intent_set"
     | "dataset_selected"
     | "layer_toggled"
+    | "dataset_profiled"
+    | "dataset_uploaded"
     | "plan_generated"
     | "approval_decision"
     | "workflow_status_change"
@@ -124,4 +126,14 @@ export type WorkspaceAction =
   | { type: "LOAD_DEMO_SCENARIO"; payload: "flood-risk" | "urban-parcels" }
   | { type: "RESET_WORKSPACE" }
   | { type: "SET_MAP_VIEWPORT"; payload: Partial<MapViewportState> }
-  | { type: "SET_MAP_BASEMAP"; payload: "dark" | "light" | "satellite" | "streets" };
+  | { type: "SET_MAP_BASEMAP"; payload: "dark" | "light" | "satellite" | "streets" }
+  | { type: "START_DATASET_PROFILING"; payload: { datasetId: string } }
+  | {
+      type: "DATASET_PROFILING_SUCCESS";
+      payload: { datasetId: string; result: DatasetProfileResult };
+    }
+  | {
+      type: "DATASET_PROFILING_ERROR";
+      payload: { datasetId: string; error: string };
+    }
+  | { type: "REGISTER_IMPORTED_DATASET"; payload: GeospatialDataset };

@@ -306,6 +306,49 @@ export function workspaceReducer(
       };
     }
 
+    case "REGISTER_IMPORTED_DATASET": {
+      const newDataset = action.payload;
+      const audit = createAudit(
+        "dataset_uploaded",
+        "human",
+        `Imported user dataset: "${newDataset.name}" (${newDataset.format.toUpperCase()})`,
+        {
+          datasetId: newDataset.id,
+          format: newDataset.format,
+          filePath: newDataset.filePath,
+        }
+      );
+
+      const hasIntent = Boolean(state.copilot.currentIntent);
+      const hasPendingApproval = state.workflow.approvalGate?.status === "pending";
+      const hasDraftWorkflow = state.workflow.status !== "draft" || hasIntent;
+      const newMode = deriveWorkspaceMode(state.mode, hasIntent, true, hasDraftWorkflow, hasPendingApproval);
+
+      const newMapLayer = {
+        id: newDataset.id,
+        name: newDataset.name,
+        type: (newDataset.geometryType === "Polygon" || newDataset.geometryType === "MultiPolygon"
+          ? ("fill" as const)
+          : newDataset.geometryType === "Point"
+          ? ("circle" as const)
+          : ("line" as const)),
+        visible: newDataset.isLoadedOnMap,
+        opacity: 0.75,
+      };
+
+      return {
+        ...state,
+        mode: newMode,
+        activeDatasetId: newDataset.id,
+        datasets: [newDataset, ...state.datasets.filter((d) => d.id !== newDataset.id)],
+        map: {
+          ...state.map,
+          layers: [newMapLayer, ...state.map.layers.filter((l) => l.id !== newDataset.id)],
+        },
+        auditTrail: [...state.auditTrail, audit],
+      };
+    }
+
     case "GENERATE_DRAFT_WORKFLOW": {
       const audit = createAudit(
         "plan_generated",
@@ -590,6 +633,114 @@ export function workspaceReducer(
           ...state.map,
           basemap: action.payload,
         },
+      };
+    }
+
+    case "START_DATASET_PROFILING": {
+      const { datasetId } = action.payload;
+      const targetDataset = state.datasets.find((d) => d.id === datasetId);
+      const audit = createAudit(
+        "dataset_selected",
+        "human",
+        `Initiated GIS profiling for dataset "${targetDataset?.name || datasetId}"`,
+        { datasetId }
+      );
+
+      const updatedDatasets = state.datasets.map((d) => {
+        if (d.id !== datasetId) return d;
+        return {
+          ...d,
+          status: "profiling" as const,
+          profilingStatus: "profiling" as const,
+          profilingError: null,
+        };
+      });
+
+      return {
+        ...state,
+        datasets: updatedDatasets,
+        auditTrail: [...state.auditTrail, audit],
+      };
+    }
+
+    case "DATASET_PROFILING_SUCCESS": {
+      const { datasetId, result } = action.payload;
+      const isReady = result.readiness.status === "ready";
+      const geomVal = result.geometry_validation || result.geometry_validity;
+      const geomType = result.primary_geometry_type || result.geometry_type || "Vector";
+      const attrs = result.columns || result.attribute_names || [];
+      const warnings = result.warnings || result.readiness?.warnings || [];
+
+      const audit = createAudit(
+        "dataset_profiled",
+        "system",
+        `Completed GIS profiling for "${result.dataset_name}". Readiness Score: ${result.readiness.score}/100 (${result.readiness.status})`,
+        {
+          datasetId,
+          score: result.readiness.score,
+          status: result.readiness.status,
+          crs: result.crs,
+          featureCount: result.feature_count,
+        }
+      );
+
+      const updatedDatasets = state.datasets.map((d) => {
+        if (d.id !== datasetId) return d;
+        return {
+          ...d,
+          name: d.name || result.dataset_name,
+          status: isReady ? ("ready" as const) : ("needs-review" as const),
+          profilingStatus: "success" as const,
+          profileResult: result,
+          profilingError: null,
+          crs: result.crs || "unknown",
+          featureCount: result.feature_count,
+          boundingBox: result.bounding_box || d.boundingBox,
+          attributes: attrs,
+          geometryType: (["Point", "Polygon", "MultiPolygon", "LineString", "Mixed"].includes(geomType)
+            ? (geomType as "Point" | "Polygon" | "MultiPolygon" | "LineString" | "Mixed")
+            : d.geometryType),
+        };
+      });
+
+      return {
+        ...state,
+        datasets: updatedDatasets,
+        validation: {
+          ...state.validation,
+          crsCompatible: result.crs !== "unknown" && result.crs !== null,
+          geometryValid: geomVal ? geomVal.invalid === 0 && geomVal.missing === 0 : true,
+          warnings,
+          lastValidated: new Date().toISOString(),
+        },
+        auditTrail: [...state.auditTrail, audit],
+      };
+    }
+
+    case "DATASET_PROFILING_ERROR": {
+      const { datasetId, error } = action.payload;
+      const targetDataset = state.datasets.find((d) => d.id === datasetId);
+      const audit = createAudit(
+        "dataset_profiled",
+        "system",
+        `GIS profiling failed for dataset "${targetDataset?.name || datasetId}": ${error}`,
+        { datasetId, error }
+      );
+
+      const updatedDatasets = state.datasets.map((d) => {
+        if (d.id !== datasetId) return d;
+        return {
+          ...d,
+          status: "error" as const,
+          profilingStatus: "error" as const,
+          profilingError: error,
+        };
+      });
+
+      return {
+        ...state,
+        datasets: updatedDatasets,
+        auditTrail: [...state.auditTrail, audit],
       };
     }
 

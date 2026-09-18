@@ -58,6 +58,24 @@ export const SAMPLE_DATASETS: GeospatialDataset[] = [
     description: "Synthetic topographic contour vectors at 5-meter vertical intervals.",
     attributes: ["contour_id", "elevation_m", "geom"],
   },
+  {
+    id: "fixture-geojson-01",
+    name: "GeoCopilot Test Fixture (Vellore Vectors)",
+    format: "geojson",
+    status: "needs-review",
+    isSample: true,
+    sourceType: "sample",
+    filePath: "backend/sample_data/test_fixture.geojson",
+    crs: "EPSG:4326",
+    geometryType: "Mixed",
+    featureCount: 4,
+    sizeBytes: 2216,
+    boundingBox: [79.112, 12.905, 79.172, 12.946],
+    isLoadedOnMap: false,
+    createdAt: "2026-09-18T12:00:00Z",
+    description: "GeoCopilot software test fixture located in backend/sample_data/test_fixture.geojson (2 Polygons, 2 Points).",
+    attributes: ["name", "zone_code", "assessed_value", "is_residential", "notes"],
+  },
 ];
 
 

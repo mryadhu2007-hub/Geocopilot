@@ -14,33 +14,54 @@ from backend.app.models.dataset import (
 )
 from backend.app.services.geometry import validate_geometries
 
-# Root directory for allowed sample data files
-ALLOWED_SAMPLE_DIR = (Path(__file__).resolve().parent.parent.parent / "sample_data").resolve()
+# Allowed data directories
+BACKEND_ROOT = Path(__file__).resolve().parent.parent.parent
+ALLOWED_SAMPLE_DIR = (BACKEND_ROOT / "sample_data").resolve()
+ALLOWED_UPLOADS_DIR = (BACKEND_ROOT / "uploads").resolve()
+ALLOWED_UPLOADS_DIR.mkdir(parents=True, exist_ok=True)
+ALLOWED_DIRS = [ALLOWED_SAMPLE_DIR, ALLOWED_UPLOADS_DIR]
 
 
 def resolve_and_validate_path(requested_path: str) -> Path:
     """
     Security check: Ensures the requested path exists and is strictly
-    located within the allowed backend/sample_data directory.
+    located within either backend/sample_data or backend/uploads.
     Rejects path traversal attacks (e.g. '../', absolute system paths).
     """
     path_obj = Path(requested_path)
 
-    # If relative, resolve against ALLOWED_SAMPLE_DIR
-    if not path_obj.is_absolute():
-        resolved_path = (ALLOWED_SAMPLE_DIR / path_obj).resolve()
-        # Alternatively, resolve against current working directory if pointing to backend/sample_data
-        if not resolved_path.exists():
-            resolved_cwd = (Path.cwd() / path_obj).resolve()
-            if resolved_cwd.is_relative_to(ALLOWED_SAMPLE_DIR):
-                resolved_path = resolved_cwd
+    # Candidate resolved paths to inspect
+    candidates = []
+    if path_obj.is_absolute():
+        candidates.append(path_obj.resolve())
     else:
-        resolved_path = path_obj.resolve()
+        # Check against current working directory (e.g. repo root)
+        candidates.append((Path.cwd() / path_obj).resolve())
+        # Check against backend root directory
+        candidates.append((BACKEND_ROOT / path_obj).resolve())
+        # Check directly in uploads
+        candidates.append((ALLOWED_UPLOADS_DIR / path_obj).resolve())
+        # Check directly in sample_data
+        candidates.append((ALLOWED_SAMPLE_DIR / path_obj).resolve())
 
-    # Enforce directory confinement
-    if not resolved_path.is_relative_to(ALLOWED_SAMPLE_DIR):
+    # Find candidate that resides strictly inside an allowed directory
+    resolved_path: Optional[Path] = None
+    for candidate in candidates:
+        if any(candidate.is_relative_to(allowed_dir) for allowed_dir in ALLOWED_DIRS):
+            if candidate.exists():
+                resolved_path = candidate
+                break
+
+    # If file doesn't exist yet, pick first candidate inside allowed dir to produce FileNotFoundError
+    if resolved_path is None:
+        for candidate in candidates:
+            if any(candidate.is_relative_to(allowed_dir) for allowed_dir in ALLOWED_DIRS):
+                resolved_path = candidate
+                break
+
+    if resolved_path is None or not any(resolved_path.is_relative_to(allowed_dir) for allowed_dir in ALLOWED_DIRS):
         raise PermissionError(
-            f"Access denied: Requested path is outside the allowed directory '{ALLOWED_SAMPLE_DIR}'."
+            "Access denied: Requested path is outside the allowed directories."
         )
 
     if not resolved_path.exists():
@@ -267,5 +288,6 @@ def profile_dataset(file_path_str: str) -> DatasetProfileResponse:
         duplicate_row_count=duplicate_rows,
         geometry_validation=geom_validation,
         readiness=readiness,
+        warnings=readiness.warnings,
         profiled_at=datetime.now(timezone.utc).isoformat(),
     )

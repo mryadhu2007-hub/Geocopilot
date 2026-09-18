@@ -39,19 +39,36 @@ export const MapWorkspace: React.FC = () => {
     zoom: DEFAULT_MAP_VIEWPORT.zoom,
   });
 
+  // Track previous active dataset to auto-fit upon new user imports
+  const prevActiveIdRef = useRef<string | null>(null);
+
   // Check if any demo dataset is marked as loaded/visible in the workspace state
-  const isDemoLayerVisible = datasets.some((d) => d.isLoadedOnMap);
+  const isDemoLayerVisible = datasets.some((d) => d.isSample && d.isLoadedOnMap);
 
   // Function to attach GeoJSON sources and layers to the active style
   const syncGeoJsonToMap = useCallback((activeMap: maplibregl.Map) => {
     try {
+      // 1. Sync static demo layer
       addOrUpdateGeoJsonSource(activeMap, DEMO_SOURCE_ID, DEMO_VELLORE_GEOJSON);
       addGeoJsonLayers(activeMap, DEMO_SOURCE_ID, DEMO_LAYER_BASE_ID);
       setGeoJsonLayerVisibility(activeMap, DEMO_LAYER_BASE_ID, isDemoLayerVisible);
+
+      // 2. Sync dynamic user-imported datasets
+      for (const dataset of datasets) {
+        if (!dataset.isSample && dataset.geoJsonData) {
+          const srcId = `dataset-source-${dataset.id}`;
+          const lyrId = `dataset-layer-${dataset.id}`;
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          addOrUpdateGeoJsonSource(activeMap, srcId, dataset.geoJsonData as any);
+          addGeoJsonLayers(activeMap, srcId, lyrId);
+          setGeoJsonLayerVisibility(activeMap, lyrId, Boolean(dataset.isLoadedOnMap));
+        }
+      }
     } catch (err) {
-      console.error("Failed to sync GeoJSON layer to map:", err);
+      console.error("Failed to sync GeoJSON layers to map:", err);
     }
-  }, [isDemoLayerVisible]);
+  }, [datasets, isDemoLayerVisible]);
 
   // Initialize MapLibre instance once on mount
   useEffect(() => {
@@ -62,7 +79,6 @@ export const MapWorkspace: React.FC = () => {
     try {
       const activeStyle =
         BASEMAP_STYLES[basemap as BasemapStyleId] || BASEMAP_STYLES.dark;
-
 
       const mapInstance = new maplibregl.Map({
         container: mapContainerRef.current,
@@ -98,12 +114,19 @@ export const MapWorkspace: React.FC = () => {
         });
       });
 
-      // Feature Click Inspection
-      const handleFeatureClick = (
-        e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }
-      ) => {
-        if (!e.features || e.features.length === 0) return;
-        const feat = e.features[0];
+      // Unified Feature Click Inspection across all layers
+      mapInstance.on("click", (e) => {
+        if (!mapInstance.isStyleLoaded()) return;
+
+        const rendered = mapInstance.queryRenderedFeatures(e.point);
+        const feat = rendered.find(
+          (f) =>
+            f.layer.id.startsWith(DEMO_LAYER_BASE_ID) ||
+            f.layer.id.startsWith("dataset-layer-")
+        );
+
+        if (!feat) return;
+
         const props = (feat.properties || {}) as Record<string, unknown>;
         const geomType = feat.geometry.type;
 
@@ -113,23 +136,19 @@ export const MapWorkspace: React.FC = () => {
           coordinates: [e.lngLat.lng, e.lngLat.lat],
           properties: props,
         });
-      };
+      });
 
-      mapInstance.on("click", `${DEMO_LAYER_BASE_ID}-fill`, handleFeatureClick);
-      mapInstance.on("click", `${DEMO_LAYER_BASE_ID}-circle`, handleFeatureClick);
-
-      // Cursor hover states
-      const handleMouseEnter = () => {
-        mapInstance.getCanvas().style.cursor = "pointer";
-      };
-      const handleMouseLeave = () => {
-        mapInstance.getCanvas().style.cursor = "";
-      };
-
-      mapInstance.on("mouseenter", `${DEMO_LAYER_BASE_ID}-fill`, handleMouseEnter);
-      mapInstance.on("mouseleave", `${DEMO_LAYER_BASE_ID}-fill`, handleMouseLeave);
-      mapInstance.on("mouseenter", `${DEMO_LAYER_BASE_ID}-circle`, handleMouseEnter);
-      mapInstance.on("mouseleave", `${DEMO_LAYER_BASE_ID}-circle`, handleMouseLeave);
+      // Unified cursor hover states
+      mapInstance.on("mousemove", (e) => {
+        if (!mapInstance.isStyleLoaded()) return;
+        const rendered = mapInstance.queryRenderedFeatures(e.point);
+        const hasInteractive = rendered.some(
+          (f) =>
+            f.layer.id.startsWith(DEMO_LAYER_BASE_ID) ||
+            f.layer.id.startsWith("dataset-layer-")
+        );
+        mapInstance.getCanvas().style.cursor = hasInteractive ? "pointer" : "";
+      });
 
       mapInstance.on("error", (e: unknown) => {
         console.warn("MapLibre internal notice:", e);
@@ -150,12 +169,35 @@ export const MapWorkspace: React.FC = () => {
     };
   }, [basemap, syncGeoJsonToMap]);
 
-  // Sync layer visibility when workspace state changes
+  // Sync layers when datasets state changes (visibility toggled or new dataset imported)
   useEffect(() => {
     if (mapRef.current && mapLoaded) {
-      setGeoJsonLayerVisibility(mapRef.current, DEMO_LAYER_BASE_ID, isDemoLayerVisible);
+      syncGeoJsonToMap(mapRef.current);
     }
-  }, [isDemoLayerVisible, mapLoaded]);
+  }, [datasets, mapLoaded, syncGeoJsonToMap]);
+
+  // Automatically zoom and fit bounds when a user-imported dataset is selected
+  useEffect(() => {
+    if (!mapRef.current || !mapLoaded) return;
+    if (state.activeDatasetId && state.activeDatasetId !== prevActiveIdRef.current) {
+      prevActiveIdRef.current = state.activeDatasetId;
+      const activeDataset = datasets.find((d) => d.id === state.activeDatasetId);
+
+      if (!activeDataset?.isSample && activeDataset?.geoJsonData) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        fitMapToGeoJson(mapRef.current, activeDataset.geoJsonData as any, 60);
+      } else if (!activeDataset?.isSample && activeDataset?.boundingBox) {
+        const [minX, minY, maxX, maxY] = activeDataset.boundingBox;
+        mapRef.current.fitBounds(
+          [
+            [minX, minY],
+            [maxX, maxY],
+          ],
+          { padding: 60, duration: 800, maxZoom: 15 }
+        );
+      }
+    }
+  }, [state.activeDatasetId, datasets, mapLoaded]);
 
   // Switch basemap style
   const handleBasemapChange = (newBasemap: BasemapStyleId) => {
@@ -180,9 +222,28 @@ export const MapWorkspace: React.FC = () => {
   // Fit to layer bounds
   const handleFitLayer = () => {
     if (!mapRef.current) return;
+    const activeDataset = datasets.find((d) => d.id === state.activeDatasetId);
+
+    if (activeDataset?.geoJsonData) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const success = fitMapToGeoJson(mapRef.current, activeDataset.geoJsonData as any, 60);
+      if (success) return;
+    }
+
+    if (activeDataset?.boundingBox) {
+      const [minX, minY, maxX, maxY] = activeDataset.boundingBox;
+      mapRef.current.fitBounds(
+        [
+          [minX, minY],
+          [maxX, maxY],
+        ],
+        { padding: 60, duration: 800, maxZoom: 15 }
+      );
+      return;
+    }
+
     const success = fitMapToGeoJson(mapRef.current, DEMO_VELLORE_GEOJSON, 60);
     if (!success) {
-      // Fallback center if bounds calculation returns null
       mapRef.current.flyTo({
         center: [DEFAULT_MAP_VIEWPORT.longitude, DEFAULT_MAP_VIEWPORT.latitude],
         zoom: DEFAULT_MAP_VIEWPORT.zoom,

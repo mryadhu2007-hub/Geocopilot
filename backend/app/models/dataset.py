@@ -40,6 +40,7 @@ class DatasetProfileResponse(BaseModel):
     duplicate_row_count: int
     geometry_validation: GeometryValidationSummary
     readiness: DataReadinessScore
+    warnings: List[str] = Field(default_factory=list)
     profiled_at: str
 
 
@@ -53,3 +54,13 @@ class HealthResponse(BaseModel):
     status: str = "ok"
     service: str = "GeoCopilot GIS Engine"
     version: str = "0.1.0"
+
+
+class UploadResponse(BaseModel):
+    """Metadata returned upon successful local dataset upload."""
+    filename: str = Field(..., description="Sanitized unique file name in backend/uploads/")
+    original_filename: str = Field(..., description="Original client-supplied file name")
+    file_path: str = Field(..., description="Relative file path for immediate profiling")
+    detected_format: str = Field(..., description="Detected format: 'geojson' or 'csv'")
+    size_bytes: int = Field(..., description="Uploaded file size in bytes")
+    message: str = "File uploaded and verified successfully."
