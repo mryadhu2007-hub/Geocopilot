@@ -1,0 +1,176 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Hero / Status Banner */
+.heroBanner {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.6) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .heroBanner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.heroContent h2 {
+  font-size: 1.25rem;
+  color: #f8fafc;
+  margin-bottom: 0.25rem;
+}
+
+.heroContent p {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.statusPills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Primary Workspace Grid */
+.workspaceGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .workspaceGrid {
+    grid-template-columns: 280px 1fr 340px;
+  }
+}
+
+.datasetCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.mapCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.copilotCol {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Bottom Workflow Area */
+.workflowSection {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Team Architecture & Status Section */
+.teamSection {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionDesc {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  margin-bottom: 1.25rem;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .teamGrid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+}
+
+.memberCard {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.memberHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.memberId {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: #38bdf8;
+}
+
+.memberRole {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.memberFocus {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  flex: 1;
+}
+
+.memberPath {
+  font-family: monospace;
+  font-size: 0.6875rem;
+  color: #64748b;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: auto;
+}
