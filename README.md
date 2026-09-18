@@ -1,15 +1,48 @@
-# GeoCopilot — Human-AI Geospatial Workspace
+<div align="center">
 
-GeoCopilot is an interactive, human-in-the-loop geospatial workspace that unifies AI workflow planning, interactive 2D/3D map visualization, and PostGIS spatial analytics. It enables users to express complex spatial questions in natural language, visually inspect AI-proposed analysis pipelines, approve or modify each execution gate, and explore resulting geospatial layers in real time.
+# 🌍 GeoCopilot
+
+**Human-AI Geospatial Workspace**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/Python-3.10+-yellow?logo=python)](https://python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)](https://fastapi.tiangolo.com/)
+
+GeoCopilot is an interactive, human-in-the-loop geospatial workspace that unifies **AI workflow planning**, **interactive 2D/3D map visualization**, and **PostGIS spatial analytics**.
+
+</div>
 
 ---
 
-## 👥 Team Roles & Module Ownership
+## ✨ What It Does
 
-To maximize developer velocity during the hackathon and avoid merge conflicts, each contributor owns a designated domain and directory:
+Express complex spatial questions in natural language. GeoCopilot:
+
+- 🤖 **Plans** — AI proposes structured, step-by-step geospatial analysis pipelines
+- 👁️ **Visualizes** — Live 2D/3D map canvas powered by MapLibre GL
+- ✅ **Collaborates** — Human-in-the-loop approval gates at every critical step
+- 📊 **Analyses** — Python/PostGIS backend for deterministic spatial data profiling
+
+---
+
+## 🏗️ Tech Stack
+
+| Layer | Technology |
+|:------|:-----------|
+| **Frontend** | Next.js 15 (App Router), TypeScript, MapLibre GL |
+| **AI Workflow** | React Flow, custom spatial plan schemas |
+| **Backend** | Python 3.10+, FastAPI, GeoPandas, Shapely, PyProj |
+| **Database** | Supabase (PostgreSQL + PostGIS) |
+| **Styling** | CSS Modules, dark geospatial theme |
+
+---
+
+## 👥 Team & Module Ownership
 
 | Contributor | Role | Responsibility | Primary Directory |
-| :--- | :--- | :--- | :--- |
+|:------------|:-----|:---------------|:------------------|
 | **Member 1** | UI/UX Designer | Designs interface in Stitch / Figma; exports visual tokens & final layouts | `src/app/globals.css`, design assets |
 | **Member 2** | Frontend & Integration Lead | Maintains Next.js App Router app, dashboard, chat UI, workflow canvas integration, and module wiring | `src/app/`, `src/components/` |
 | **Member 3** | Map & Geospatial Lead | Implements MapLibre GL map canvas, vector/raster basemaps, and GeoJSON layer rendering | `src/modules/map/` |
@@ -22,146 +55,156 @@ To maximize developer velocity during the hackathon and avoid merge conflicts, e
 
 ```text
 geocopilot/
-├── .env.example                # Template for environment variables (Supabase, AI keys)
-├── .gitignore                  # Git ignore rules for Next.js and secrets
+├── .env.example                # Template for environment variables
+├── .gitignore                  # Git ignore rules for Next.js, Python & secrets
+├── LICENSE                     # MIT License
 ├── next.config.ts              # Next.js configuration
-├── package.json                # Dependencies and dev scripts
-├── tsconfig.json               # TypeScript strict configuration with `@/*` path alias
-├── README.md                   # Project and team architecture documentation
+├── package.json                # Frontend dependencies and dev scripts
+├── tsconfig.json               # TypeScript strict configuration with @/* path alias
+├── README.md                   # Project documentation (this file)
+├── backend/                    # Python FastAPI GIS engine
+│   ├── requirements.txt        # Python dependencies
+│   ├── README.md               # Backend-specific documentation
+│   └── app/
+│       ├── main.py             # FastAPI application entry point
+│       ├── api/routes.py       # REST API route definitions
+│       ├── models/             # Pydantic data models
+│       └── services/           # GIS business logic (profiler, geometry, upload)
 └── src/
     ├── app/                    # Next.js App Router root
     │   ├── globals.css         # Global design tokens and dark geospatial theme
     │   ├── layout.tsx          # Root HTML shell, metadata, and viewport settings
-    │   ├── page.tsx            # GeoCopilot workspace dashboard page
-    │   └── page.module.css     # CSS module styling for workspace dashboard
-    ├── components/             # Reusable, shared UI primitives
-    │   └── common/
-    │       ├── Header.tsx      # Application navigation bar and branding
-    │       ├── Header.module.css
-    │       ├── StatusBadge.tsx # Module state indicator (Ready, Stub, In Progress)
-    │       ├── StatusBadge.module.css
-    │       ├── Card.tsx        # Container card primitive
-    │       └── Card.module.css
-    ├── modules/                # Feature modules (isolated for team members)
-    │   ├── map/                # [Member 3] MapLibre visualization module
-    │   │   ├── types.ts        # Map viewport, layers, and coordinate interfaces
-    │   │   └── components/
-    │   │       ├── MapPlaceholder.tsx
-    │   │       └── MapPlaceholder.module.css
-    │   ├── workflow/           # [Member 2 & 5] React Flow pipeline module
-    │   │   ├── types.ts        # Workflow node, edge, and execution interfaces
-    │   │   └── components/
-    │   │       ├── WorkflowPlaceholder.tsx
-    │   │       └── WorkflowPlaceholder.module.css
-    │   ├── copilot/            # [Member 5 & 2] AI reasoning and chat module
-    │   │   ├── types.ts        # Chat messages and structured spatial plan schemas
-    │   │   └── components/
-    │   │       ├── CopilotPlaceholder.tsx
-    │   │       └── CopilotPlaceholder.module.css
+    │   └── page.tsx            # GeoCopilot workspace dashboard page
+    ├── components/common/      # Shared UI primitives (Header, Card, StatusBadge)
+    ├── modules/
+    │   ├── map/                # MapLibre GL visualization module
+    │   ├── workflow/           # React Flow pipeline canvas module
+    │   ├── copilot/            # AI reasoning and chat module
+    │   ├── workspace/          # Main workspace state and panels
     │   └── data/               # Geospatial catalog & layer management
-    │       ├── types.ts        # Geospatial dataset interfaces
-    │       └── components/
-    │           ├── DatasetPlaceholder.tsx
-    │           └── DatasetPlaceholder.module.css
-    ├── services/               # External backend and cloud integrations
-    │   └── supabase/           # [Member 4] Supabase & PostGIS integration boundary
-    │       ├── client.ts       # Documented Supabase client boundary and env checks
-    │       └── types.ts        # Database record and spatial query interfaces
+    ├── services/
+    │   ├── supabase/           # Supabase & PostGIS integration
+    │   └── gis/                # GIS client utilities
     ├── lib/                    # Shared utilities and application constants
-    │   ├── constants.ts        # Team definitions and application metadata
-    │   └── utils.ts            # Class name joiner (`cn`) and coordinate formatters
     └── types/                  # Global shared TypeScript contracts
-        └── index.ts            # Universal coordinate and workspace types
 ```
 
 ---
 
-## 🚀 How to Run the Project
+## 🚀 Getting Started
 
-### 1. Install Dependencies
+### Prerequisites
+
+- **Node.js** 18+
+- **Python** 3.10+
+- **Git**
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/mryadhu2007-hub/Geocopilot.git
+cd Geocopilot
+```
+
+### 2. Install Frontend Dependencies
+
 ```bash
 npm install
 ```
 
-### 2. Configure Environment (Optional for Local Stub Mode)
+### 3. Install Backend Dependencies
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+### 4. Configure Environment Variables
+
 ```bash
 cp .env.example .env.local
 ```
-*(No environment variables are required to run the initial foundation in stub mode).*
 
-### 3. Start the Development Server
+Edit `.env.local` and fill in your Supabase and AI API credentials. The app runs in **stub mode** without any credentials.
+
+### 5. Start the Development Servers
+
+**Frontend** (Next.js):
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000)
 
-### 4. Build for Production
+**Backend** (FastAPI):
 ```bash
-npm run build
-npm run start
+python -m uvicorn backend.app.main:app --reload --port 8000
 ```
+Open [http://localhost:8000/docs](http://localhost:8000/docs) for the interactive API docs.
 
 ---
 
-## 🧩 Placeholders & Integration Guide
+## 📡 API Overview
 
-The following modules are currently clean, typed placeholders to avoid unneeded dependencies in the foundation. Here is how each contributor should integrate their real implementation:
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| `/health` | GET | System heartbeat and engine identity |
+| `/api/profile` | POST | Profile a geospatial dataset (CRS, geometry validation, readiness score) |
+| `/api/upload` | POST | Upload a geospatial file for analysis |
 
-### 1. MapLibre Integration (`src/modules/map/`) — Assigned to Member 3
-1. Install MapLibre:
-   ```bash
-   npm install maplibre-gl
-   npm install --save-dev @types/maplibre-gl
-   ```
-2. In `src/modules/map/components/MapPlaceholder.tsx`:
-   - Replace the placeholder markup with a MapLibre GL container (or `react-map-gl/maplibre`).
-   - Use the interfaces from `src/modules/map/types.ts` (`MapViewportState`, `MapLayer`).
-   - Propagate viewport changes back to the parent via `onViewportChange`.
-
-### 2. React Flow Workflow (`src/modules/workflow/`) — Assigned to Member 2 & 5
-1. Install React Flow:
-   ```bash
-   npm install @xyflow/react
-   ```
-2. In `src/modules/workflow/components/WorkflowPlaceholder.tsx`:
-   - Mount `<ReactFlow>` using the node and edge definitions in `src/modules/workflow/types.ts`.
-   - Implement custom nodes for `spatial_filter`, `buffer_geometry`, and `human_approval_gate`.
-
-### 3. AI Copilot (`src/modules/copilot/`) — Assigned to Member 5 & 2
-1. Connect your LLM endpoint (OpenAI, Anthropic, or local model) via Next.js Route Handlers (`src/app/api/copilot/route.ts`).
-2. Replace `CopilotPlaceholder.tsx` with an active chat session that emits `CopilotPlanProposal` objects defined in `src/modules/copilot/types.ts`.
-3. Dispatch confirmed plans to the workflow module.
-
-### 4. Supabase & PostGIS (`src/services/supabase/`) — Assigned to Member 4
-1. Install the Supabase client:
-   ```bash
-   npm install @supabase/supabase-js
-   ```
-2. Add your project URL and anon key to `.env.local`:
-   ```bash
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   ```
-3. In `src/services/supabase/client.ts`, initialize the client with `createClient(url, key)`.
-4. Define your PostGIS RPC endpoints for spatial queries (e.g., `ST_DWithin`, `ST_Intersects`).
-
-### 5. Design System Implementation — Assigned to Member 1
-1. Translate Stitch / Figma color palettes, component styles, and layouts into `src/app/globals.css` and CSS module files.
-2. Ensure components maintain the shared CSS variable conventions.
+Full API documentation available at `http://localhost:8000/docs` when the backend is running.
 
 ---
 
-## 🌿 Git Branching Rules
+## 🧩 Module Integration Guide
 
-To prevent code collisions, team members must strictly adhere to the following branch strategy:
+### MapLibre GL (`src/modules/map/`)
+```bash
+npm install maplibre-gl
+```
+Replace `MapPlaceholder.tsx` with a live MapLibre GL container. Use the interfaces from `src/modules/map/types.ts`.
 
-1. **Never commit directly to `main`.**
-2. Create feature branches prefixed by your area:
-   - `feature/maplibre-canvas` (Member 3)
-   - `feature/supabase-postgis` (Member 4)
-   - `feature/copilot-ai-planner` (Member 5)
-   - `feature/workflow-react-flow` (Member 2)
-   - `feature/ui-stitch-design` (Member 1)
-3. Open Pull Requests into `main` after verifying:
-   - `npm run build` succeeds with zero TypeScript errors.
-   - All module contracts in `types.ts` remain satisfied.
+### React Flow Workflow (`src/modules/workflow/`)
+```bash
+npm install @xyflow/react
+```
+Mount `<ReactFlow>` with custom nodes for `spatial_filter`, `buffer_geometry`, and `human_approval_gate`.
+
+### AI Copilot (`src/modules/copilot/`)
+Connect your LLM (OpenAI / Anthropic / local) via Next.js Route Handlers at `src/app/api/copilot/route.ts`.
+
+### Supabase & PostGIS (`src/services/supabase/`)
+```bash
+npm install @supabase/supabase-js
+```
+Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to `.env.local`.
+
+---
+
+## 🌿 Git Branching Strategy
+
+> **Never commit directly to `main`.**
+
+| Branch | Assigned To |
+|:-------|:------------|
+| `feature/maplibre-canvas` | Member 3 |
+| `feature/supabase-postgis` | Member 4 |
+| `feature/copilot-ai-planner` | Member 5 |
+| `feature/workflow-react-flow` | Member 2 |
+| `feature/ui-stitch-design` | Member 1 |
+
+Open a Pull Request into `main` only after:
+- ✅ `npm run build` passes with zero TypeScript errors
+- ✅ All module contracts in `types.ts` remain satisfied
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+Built with ❤️ for the GeoCopilot Hackathon
+
+</div>
