@@ -1,0 +1,55 @@
+{
+  "type": "FeatureCollection",
+  "name": "GeoCopilot test fixture - invalid geometries",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "valid-poly",
+      "properties": {
+        "name": "Valid Parcel",
+        "category": "Test"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.10, 12.90],
+            [79.12, 12.90],
+            [79.12, 12.92],
+            [79.10, 12.92],
+            [79.10, 12.90]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "invalid-self-intersecting-poly",
+      "properties": {
+        "name": "Bowtie Self-Intersecting Polygon",
+        "category": "Invalid"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.10, 12.90],
+            [79.12, 12.92],
+            [79.10, 12.92],
+            [79.12, 12.90],
+            [79.10, 12.90]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "empty-geometry-feature",
+      "properties": {
+        "name": "Missing Geometry Record",
+        "category": "Empty"
+      },
+      "geometry": null
+    }
+  ]
+}

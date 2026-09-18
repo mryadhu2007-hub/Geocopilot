@@ -1,0 +1,1 @@
+# GeoCopilot Backend Root Package

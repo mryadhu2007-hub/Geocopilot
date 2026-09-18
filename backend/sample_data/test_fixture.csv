@@ -1,0 +1,5 @@
+station_id,station_name,latitude,longitude,elevation_m,sensor_status
+ST-01,Vellore Central Weather Station,12.9165,79.1325,214.5,active
+ST-02,Katpadi North Hydrology Monitor,12.9734,79.1385,198.0,active
+ST-03,Bagayam South Monitoring Post,12.8750,79.1350,225.2,maintenance
+ST-04,Palar River Gauge Station,12.9360,79.1720,205.8,active

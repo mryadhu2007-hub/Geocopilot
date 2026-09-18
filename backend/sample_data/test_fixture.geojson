@@ -1,0 +1,88 @@
+{
+  "type": "FeatureCollection",
+  "name": "GeoCopilot test fixture",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "fixture-poly-01",
+      "properties": {
+        "name": "Vellore Central Urban Sector (Test Fixture)",
+        "zone_code": "URB-01",
+        "assessed_value": 450000,
+        "is_residential": true,
+        "notes": "GeoCopilot test fixture - not authoritative data"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.115, 12.905],
+            [79.155, 12.905],
+            [79.158, 12.935],
+            [79.112, 12.935],
+            [79.115, 12.905]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fixture-poly-02",
+      "properties": {
+        "name": "Palar River Inundation Zone (Test Fixture)",
+        "zone_code": "FL-100",
+        "assessed_value": null,
+        "is_residential": false,
+        "notes": "GeoCopilot test fixture - not authoritative data"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [79.095, 12.932],
+            [79.175, 12.946],
+            [79.172, 12.936],
+            [79.092, 12.922],
+            [79.095, 12.932]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fixture-pt-01",
+      "properties": {
+        "name": "Vellore Fort Landmark (Test Fixture)",
+        "zone_code": "HERITAGE",
+        "assessed_value": 1200000,
+        "is_residential": false,
+        "notes": "GeoCopilot test fixture - not authoritative data"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1293, 12.9202]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "fixture-pt-02",
+      "properties": {
+        "name": "Katpadi Junction Transit (Test Fixture)",
+        "zone_code": "TRANSIT",
+        "assessed_value": 850000,
+        "is_residential": false,
+        "notes": "GeoCopilot test fixture - not authoritative data"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [79.1385, 12.9734]
+      }
+    }
+  ]
+}
