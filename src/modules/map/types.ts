@@ -35,9 +35,21 @@ export interface MapViewConfig {
   interactive?: boolean;
 }
 
+export type BasemapStyleId = "dark" | "light" | "satellite" | "streets";
+
+
+export interface InspectedFeatureInfo {
+  layerId: string;
+  geometryType: string;
+  coordinates?: [number, number];
+  properties: Record<string, unknown>;
+}
+
 export interface MapComponentProps {
   viewport?: Partial<MapViewportState>;
   layers?: MapLayer[];
   onViewportChange?: (viewport: MapViewportState) => void;
   onLayerClick?: (layerId: string, feature: unknown) => void;
+  onFeatureInspect?: (feature: InspectedFeatureInfo | null) => void;
 }
+

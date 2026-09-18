@@ -9,7 +9,7 @@ import type { WorkflowGraph } from "@/modules/workflow/types";
 export const SAMPLE_DATASETS: GeospatialDataset[] = [
   {
     id: "sample-parcels-01",
-    name: "Sample Dataset: Metro Urban Parcels (Demo)",
+    name: "Sample Dataset: Vellore Urban Parcels (Demo)",
     format: "geojson",
     status: "ready",
     isSample: true,
@@ -18,15 +18,15 @@ export const SAMPLE_DATASETS: GeospatialDataset[] = [
     geometryType: "Polygon",
     featureCount: 1420,
     sizeBytes: 2450000,
-    boundingBox: [-122.48, 37.72, -122.36, 37.81],
+    boundingBox: [79.115, 12.905, 79.158, 12.935],
     isLoadedOnMap: true,
     createdAt: "2026-09-18T10:00:00Z",
-    description: "Synthesized cadastral parcel boundaries for urban density and zoning analysis.",
+    description: "Synthesized urban cadastral boundaries around central Vellore for density analysis.",
     attributes: ["parcel_id", "zoning_code", "assessed_val", "impervious_pct", "geom"],
   },
   {
     id: "sample-flood-02",
-    name: "Sample Dataset: 100-Year Flood Hazard Zones (Demo)",
+    name: "Sample Dataset: Palar River Hazard Zone (Demo)",
     format: "geojson",
     status: "needs-review",
     isSample: true,
@@ -35,15 +35,15 @@ export const SAMPLE_DATASETS: GeospatialDataset[] = [
     geometryType: "MultiPolygon",
     featureCount: 86,
     sizeBytes: 980000,
-    boundingBox: [-122.51, 37.70, -122.35, 37.83],
+    boundingBox: [79.092, 12.920, 79.175, 12.946],
     isLoadedOnMap: true,
     createdAt: "2026-09-18T10:15:00Z",
-    description: "Synthesized FEMA 100-year inundation risk zones. Requires CRS reprojection check.",
+    description: "Synthesized Palar river flood buffer zone. Requires CRS reprojection check.",
     attributes: ["zone_code", "risk_level", "base_flood_elev", "geom"],
   },
   {
     id: "sample-contours-03",
-    name: "Sample Dataset: Coastal Elevation Contours (Demo)",
+    name: "Sample Dataset: Bagayam Elevation Contours (Demo)",
     format: "geojson",
     status: "ready",
     isSample: true,
@@ -52,13 +52,14 @@ export const SAMPLE_DATASETS: GeospatialDataset[] = [
     geometryType: "LineString",
     featureCount: 520,
     sizeBytes: 1340000,
-    boundingBox: [-122.52, 37.71, -122.37, 37.82],
+    boundingBox: [79.120, 12.860, 79.150, 12.890],
     isLoadedOnMap: false,
     createdAt: "2026-09-18T10:30:00Z",
     description: "Synthetic topographic contour vectors at 5-meter vertical intervals.",
     attributes: ["contour_id", "elevation_m", "geom"],
   },
 ];
+
 
 /**
  * Baseline 6-Stage Empty Workflow Graph
@@ -148,8 +149,8 @@ export const initialWorkspaceState: WorkspaceState = {
   activeDatasetId: null,
   map: {
     viewport: {
-      longitude: -122.4194,
-      latitude: 37.7749,
+      longitude: 79.1325,
+      latitude: 12.9165,
       zoom: 12,
       pitch: 0,
       bearing: 0,
@@ -157,14 +158,14 @@ export const initialWorkspaceState: WorkspaceState = {
     layers: [
       {
         id: "sample-parcels-01",
-        name: "Metro Urban Parcels",
+        name: "Vellore Urban Parcels",
         type: "fill",
         visible: true,
         opacity: 0.65,
       },
       {
         id: "sample-flood-02",
-        name: "Flood Hazard Zones",
+        name: "Palar River Hazard Zone",
         type: "fill",
         visible: true,
         opacity: 0.5,
