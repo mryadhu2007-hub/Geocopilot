@@ -1,210 +1,157 @@
-<div align="center">
+# GeoCopilot — Deterministic Python GIS Backend
 
-# 🌍 GeoCopilot
-
-**Human-AI Geospatial Workspace**
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Python](https://img.shields.io/badge/Python-3.10+-yellow?logo=python)](https://python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green?logo=fastapi)](https://fastapi.tiangolo.com/)
-
-GeoCopilot is an interactive, human-in-the-loop geospatial workspace that unifies **AI workflow planning**, **interactive 2D/3D map visualization**, and **PostGIS spatial analytics**.
-
-</div>
+The GeoCopilot backend provides deterministic geospatial dataset profiling, CRS inspection, topological geometry validation, and readiness scoring. It serves as the authoritative GIS engine while the Next.js frontend handles human-in-the-loop interaction and visualization.
 
 ---
 
-## ✨ What It Does
+## 🚀 Quickstart
 
-Express complex spatial questions in natural language. GeoCopilot:
+### 1. Requirements
 
-- 🤖 **Plans** — AI proposes structured, step-by-step geospatial analysis pipelines
-- 👁️ **Visualizes** — Live 2D/3D map canvas powered by MapLibre GL
-- ✅ **Collaborates** — Human-in-the-loop approval gates at every critical step
-- 📊 **Analyses** — Python/PostGIS backend for deterministic spatial data profiling
-
----
-
-## 🏗️ Tech Stack
-
-| Layer | Technology |
-|:------|:-----------|
-| **Frontend** | Next.js 15 (App Router), TypeScript, MapLibre GL |
-| **AI Workflow** | React Flow, custom spatial plan schemas |
-| **Backend** | Python 3.10+, FastAPI, GeoPandas, Shapely, PyProj |
-| **Database** | Supabase (PostgreSQL + PostGIS) |
-| **Styling** | CSS Modules, dark geospatial theme |
-
----
-
-## 👥 Team & Module Ownership
-
-| Contributor | Role | Responsibility | Primary Directory |
-|:------------|:-----|:---------------|:------------------|
-| **Member 1** | UI/UX Designer | Designs interface in Stitch / Figma; exports visual tokens & final layouts | `src/app/globals.css`, design assets |
-| **Member 2** | Frontend & Integration Lead | Maintains Next.js App Router app, dashboard, chat UI, workflow canvas integration, and module wiring | `src/app/`, `src/components/` |
-| **Member 3** | Map & Geospatial Lead | Implements MapLibre GL map canvas, vector/raster basemaps, and GeoJSON layer rendering | `src/modules/map/` |
-| **Member 4** | Backend & Database Lead | Sets up Supabase, PostGIS spatial tables, API routes, and spatial queries | `src/services/supabase/` |
-| **Member 5** | AI & Workflow Lead | Defines spatial plan schemas, prompt orchestration, and structured pipeline steps | `src/modules/copilot/`, `src/modules/workflow/` |
-
----
-
-## 📁 Directory Structure
-
-```text
-geocopilot/
-├── .env.example                # Template for environment variables
-├── .gitignore                  # Git ignore rules for Next.js, Python & secrets
-├── LICENSE                     # MIT License
-├── next.config.ts              # Next.js configuration
-├── package.json                # Frontend dependencies and dev scripts
-├── tsconfig.json               # TypeScript strict configuration with @/* path alias
-├── README.md                   # Project documentation (this file)
-├── backend/                    # Python FastAPI GIS engine
-│   ├── requirements.txt        # Python dependencies
-│   ├── README.md               # Backend-specific documentation
-│   └── app/
-│       ├── main.py             # FastAPI application entry point
-│       ├── api/routes.py       # REST API route definitions
-│       ├── models/             # Pydantic data models
-│       └── services/           # GIS business logic (profiler, geometry, upload)
-└── src/
-    ├── app/                    # Next.js App Router root
-    │   ├── globals.css         # Global design tokens and dark geospatial theme
-    │   ├── layout.tsx          # Root HTML shell, metadata, and viewport settings
-    │   └── page.tsx            # GeoCopilot workspace dashboard page
-    ├── components/common/      # Shared UI primitives (Header, Card, StatusBadge)
-    ├── modules/
-    │   ├── map/                # MapLibre GL visualization module
-    │   ├── workflow/           # React Flow pipeline canvas module
-    │   ├── copilot/            # AI reasoning and chat module
-    │   ├── workspace/          # Main workspace state and panels
-    │   └── data/               # Geospatial catalog & layer management
-    ├── services/
-    │   ├── supabase/           # Supabase & PostGIS integration
-    │   └── gis/                # GIS client utilities
-    ├── lib/                    # Shared utilities and application constants
-    └── types/                  # Global shared TypeScript contracts
-```
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- **Node.js** 18+
-- **Python** 3.10+
-- **Git**
-
-### 1. Clone the Repository
+Verify that Python 3.10+ and the core GIS packages are available:
 
 ```bash
-git clone https://github.com/mryadhu2007-hub/Geocopilot.git
-cd Geocopilot
+python -c "import geopandas, shapely, pyproj, fastapi, uvicorn; print('GIS environment OK')"
 ```
 
-### 2. Install Frontend Dependencies
+Or install from `requirements.txt`:
 
 ```bash
-npm install
+pip install -r requirements.txt
 ```
 
-### 3. Install Backend Dependencies
+### 2. Start the Development Server
 
-```bash
-pip install -r backend/requirements.txt
-```
+From the project root:
 
-### 4. Configure Environment Variables
-
-```bash
-cp .env.example .env.local
-```
-
-Edit `.env.local` and fill in your Supabase and AI API credentials. The app runs in **stub mode** without any credentials.
-
-### 5. Start the Development Servers
-
-**Frontend** (Next.js):
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000)
-
-**Backend** (FastAPI):
 ```bash
 python -m uvicorn backend.app.main:app --reload --port 8000
 ```
-Open [http://localhost:8000/docs](http://localhost:8000/docs) for the interactive API docs.
 
----
+Or from the `backend/` directory:
 
-## 📡 API Overview
-
-| Endpoint | Method | Description |
-|:---------|:-------|:------------|
-| `/health` | GET | System heartbeat and engine identity |
-| `/api/profile` | POST | Profile a geospatial dataset (CRS, geometry validation, readiness score) |
-| `/api/upload` | POST | Upload a geospatial file for analysis |
-
-Full API documentation available at `http://localhost:8000/docs` when the backend is running.
-
----
-
-## 🧩 Module Integration Guide
-
-### MapLibre GL (`src/modules/map/`)
 ```bash
-npm install maplibre-gl
+cd backend
+python -m uvicorn app.main:app --reload --port 8000
 ```
-Replace `MapPlaceholder.tsx` with a live MapLibre GL container. Use the interfaces from `src/modules/map/types.ts`.
 
-### React Flow Workflow (`src/modules/workflow/`)
+- **Base URL**: `http://localhost:8000`
+- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Interactive OpenAPI Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Alternative ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+
+---
+
+## 📡 API Endpoints
+
+### `GET /health`
+Returns system heartbeat and engine identity.
+
+**Sample Response:**
+```json
+{
+  "status": "ok",
+  "service": "GeoCopilot GIS Engine",
+  "version": "0.1.0"
+}
+```
+
+---
+
+### `POST /api/profile`
+Profiles a local geospatial vector dataset and outputs structured metadata, topological validation, and readiness scores.
+
+**Request Body:**
+```json
+{
+  "file_path": "test_fixture.geojson"
+}
+```
+*(Accepts paths relative to `backend/sample_data` or within the sample repository).*
+
+**Sample Response:**
+```json
+{
+  "dataset_name": "test_fixture.geojson",
+  "file_path": "C:\\...\\backend\\sample_data\\test_fixture.geojson",
+  "detected_format": "geojson",
+  "primary_geometry_type": "Mixed (Point, Polygon)",
+  "geometry_types": ["Point", "Polygon"],
+  "feature_count": 4,
+  "crs": "OGC:CRS84",
+  "crs_detected": true,
+  "crs_note": "Explicit CRS detected from dataset metadata: OGC:CRS84",
+  "bounding_box": [79.092, 12.905, 79.175, 12.9734],
+  "columns": ["name", "zone_code", "assessed_value", "is_residential", "notes"],
+  "numeric_columns": ["assessed_value"],
+  "text_columns": ["name", "zone_code", "notes"],
+  "missing_value_counts": {
+    "name": 0,
+    "zone_code": 0,
+    "assessed_value": 1,
+    "is_residential": 0,
+    "notes": 0
+  },
+  "duplicate_row_count": 0,
+  "geometry_validation": {
+    "valid": 4,
+    "invalid": 0,
+    "empty": 0,
+    "missing": 0,
+    "total": 4,
+    "invalid_reasons": []
+  },
+  "readiness": {
+    "score": 100.0,
+    "status": "ready",
+    "reasons": [
+      "Dataset passed all automated structural, geometric, and CRS validation gates.",
+      "Valid CRS identified: OGC:CRS84."
+    ],
+    "warnings": []
+  },
+  "profiled_at": "2026-09-18T18:15:00.000000+00:00"
+}
+```
+
+---
+
+## 🔒 Security: Path Confinement
+
+The profiler strictly enforces that requested file paths resolve inside `backend/sample_data/`. Path traversal attempts (e.g., `../../package.json`, absolute root drives, system directories) are rejected immediately with **HTTP 403 Forbidden**.
+
+---
+
+## 📐 Deterministic Data Readiness Score Rules
+
+The readiness score is calculated transparently using an objective deduction rubric:
+
+| Rule Check | Score Adjustment | Note |
+| :--- | :--- | :--- |
+| **Base Score** | `100.0` | Pristine dataset starting baseline |
+| **Missing / Unknown CRS** | `-25.0` | CRS missing or undeclared; warning issued |
+| **Invalid Geometries** | `-15.0` per invalid feature (max `-35.0`) | Self-intersections, bowties, open rings |
+| **Missing / Empty Geometries** | `-10.0` per missing feature (max `-25.0`) | Null geometry records |
+| **High Attribute Null Rate** | `-5.0` per column with >40% nulls (max `-15.0`) | Sparsely populated attributes |
+| **Empty Dataset (0 features)** | Score set to `0.0` | Empty dataset cannot proceed |
+
+**Readiness Status Bands:**
+- `ready`: Score ≥ 80.0, 0 invalid geometries, and CRS detected.
+- `needs-review`: Score between 40.0 and 79.9, or missing CRS requiring supervisor confirmation.
+- `error`: Score < 40.0, or 0 features.
+
+---
+
+## 🧪 Running Automated Tests
+
+Run the test suite via Python's standard library `unittest`:
+
 ```bash
-npm install @xyflow/react
+python -m unittest discover backend/tests
 ```
-Mount `<ReactFlow>` with custom nodes for `spatial_filter`, `buffer_geometry`, and `human_approval_gate`.
 
-### AI Copilot (`src/modules/copilot/`)
-Connect your LLM (OpenAI / Anthropic / local) via Next.js Route Handlers at `src/app/api/copilot/route.ts`.
+Or via `pytest` (if installed in your environment):
 
-### Supabase & PostGIS (`src/services/supabase/`)
 ```bash
-npm install @supabase/supabase-js
+python -m pytest backend/tests
 ```
-Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to `.env.local`.
-
----
-
-## 🌿 Git Branching Strategy
-
-> **Never commit directly to `main`.**
-
-| Branch | Assigned To |
-|:-------|:------------|
-| `feature/maplibre-canvas` | Member 3 |
-| `feature/supabase-postgis` | Member 4 |
-| `feature/copilot-ai-planner` | Member 5 |
-| `feature/workflow-react-flow` | Member 2 |
-| `feature/ui-stitch-design` | Member 1 |
-
-Open a Pull Request into `main` only after:
-- ✅ `npm run build` passes with zero TypeScript errors
-- ✅ All module contracts in `types.ts` remain satisfied
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-<div align="center">
-
-Built with ❤️ for the GeoCopilot Hackathon
-
-</div>
